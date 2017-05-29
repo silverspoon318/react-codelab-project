@@ -38,16 +38,14 @@ var _routes2 = _interopRequireDefault(_routes);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-app.use('/api', _routes2.default);
-/*
-    이렇게 서버 메인 파일에서 api 라우터를 불러오게 되면,
-    http://URL/api/account/signup 이런식으로 api 를 사용 할 수 있게 됩니다
-*/
-
-/* mongodb connection */
-
+var app = (0, _express2.default)();
 
 // setup routers & static directory
+
+var port = 3000;
+var devPort = 4000;
+
+/* mongodb connection */
 var db = _mongoose2.default.connection;
 db.on('error', console.error);
 db.once('open', function () {
@@ -79,10 +77,14 @@ app.use(_bodyParser2.default.json());
 //morgan: HTTP 요청을 로그하는 미들웨어
 //body-parser: 요청에서 JSON을 파싱할때 사용되는 미들웨어
 
-var app = (0, _express2.default)();
-var port = 3000;
 
 app.use('/', _express2.default.static(_path2.default.join(__dirname, './../public')));
+
+app.use('/api', _routes2.default);
+/*
+    이렇게 서버 메인 파일에서 api 라우터를 불러오게 되면,
+    http://URL/api/account/signup 이런식으로 api 를 사용 할 수 있게 됩니다
+*/
 
 app.get('/hello', function (req, res) {
     return res.send('Hello World');
@@ -92,12 +94,10 @@ app.listen(port, function () {
     console.log('Express is listening on port', port);
 });
 
-var devPort = 4000;
-
 if (process.env.NODE_ENV == 'development') {
     console.log('Server is running on development mode');
     var config = require('../webpack.dev.config');
-    var compiler = webpack(config);
+    var compiler = (0, _webpack2.default)(config);
     var devServer = new _webpackDevServer2.default(compiler, config.devServer);
     devServer.listen(devPort, function () {
         console.log('webpack-dev-server is listening on port', devPort);
